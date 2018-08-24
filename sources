@@ -10,7 +10,8 @@ INF_NAME=planck
 NTTARGETFILE0=$(OBJ_PATH)\$(O)\$(INF_NAME).inf
 PASS0_BINPLACE=$(NTTARGETFILE0)
 
-SOURCES=driver.c
+SOURCES=driver.c \
+        device.c
 
 TARGET_DESTINATION=wdf
 

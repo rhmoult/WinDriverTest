@@ -2,10 +2,12 @@
  * Copyright (c) 2018 Planck Star Online Solutions
  */
 
-#define INIT GUID
+#define INITGUID
 
 #include <ntddk.h>
 #include <wdf.h>
+
+#include "device.h"
 
 
 typedef unsigned int UINT;
@@ -15,4 +17,4 @@ typedef unsigned int UINT;
  */
 
  DRIVER_INITIALIZE DriverEntry;
- VOID Planck_Unload(PDRIVER_OBJECT DriverObject);
+ EVT_WDF_DRIVER_DEVICE_ADD PlanckEvtDeviceAdd;

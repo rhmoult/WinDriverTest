@@ -2,7 +2,7 @@
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (INIT, DriverEntry)
-#pragma alloc_text (PAGE, Planck_Unload)
+#pragma alloc_text (PAGE, PlanckEvtDeviceAdd)
 #endif
 
 NTSTATUS
@@ -11,36 +11,39 @@ DriverEntry(
     IN PUNICODE_STRING RegistryPath
     )
 {
-    NTSTATUS NtStatus = STATUS_SUCCESS;
-    UINT uiIndex = 0;
-    PDEVICE_OBJECT DeviceObject = NULL;
-    UNICODE_STRING usDriverName, usDosDeviceName;
+    WDF_DRIVER_CONFIG config;
+    NTSTATUS status;
 
-    DbgPrint("Driver Entry Called \r\n");
+    WDF_DRIVER_CONFIG_INIT(&config, PlanckEvtDeviceAdd);
 
-    RtlInitUnicodeString(&usDriverName, L"\\Device\\Planck");
-    RtlInitUnicodeString(&usDosDeviceName, L"\\DosDevices\\Planck");
+    status = WdfDriverCreate(DriverObject,
+        RegistryPath,
+        WDF_NO_OBJECT_ATTRIBUTES,
+        &config,
+        WDF_NO_HANDLE);
 
-    NtStatus = IoCreateDevice(DriverObject, 0, &usDriverName,
-        FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DeviceObject);
-
-    if(NtStatus == STATUS_SUCCESS) {
-        DbgPrint("Created device! \r\n");
-        DriverObject->DriverUnload = Planck_Unload;
-        IoCreateSymbolicLink(&usDosDeviceName, &usDriverName);
+    if (!NT_SUCCESS(status)) {
+        KdPrint("Error: WdfDriverCreate failed 0x%x\r\n");
     }
 
-    return NtStatus;
-
+    return status;
 }
 
-VOID Planck_Unload(PDRIVER_OBJECT DriverObject) {
-    UNICODE_STRING usDosDeviceName;
+NTSTATUS
+PlanckEvtDeviceAdd(
+    IN WDFDRIVER Driver,
+    IN PWDFDEVICE_INIT DeviceInit
+    )
+{
+    NTSTATUS status;
 
-    DbgPrint("Planck_Unload called!  \r\n");
+    UNREFERENCED_PARAMETER(Driver);
 
-    RtlInitUnicodeString(&usDosDeviceName, L"\\DosDevices\\Planck");
-    IoDeleteSymbolicLink(&usDosDeviceName);
+    PAGED_CODE();
 
-    IoDeleteDevice(DriverObject->DeviceObject);
+    KdPrint(("Enter PlanckDeviceAdd\n"));
+
+    status = PlanckDeviceCreate(DeviceInit);
+
+    return status;
 }
