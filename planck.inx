@@ -1,0 +1,116 @@
+;/*++
+;
+;Copyright (c) 2018  Planck Star Online Solutions
+;
+;Module Name:
+;    PLANCK.INF
+;
+;Abstract:
+;    INF file for installing the Driver Frameworks Planck Driver
+;
+;Installation Notes: 
+;    Using Devcon: Type "devcon install Planck.inf root\Planck" to install
+;
+;--*/
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171}
+Provider=%MSFT%
+DriverVer=03/20/2003,5.00.3788
+CatalogFile=KmdfSamples.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg     
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+
+[SourceDisksFiles]
+PLANCK.sys  = 1,,
+
+;*****************************************
+; PLANCK  Install Section
+;*****************************************
+
+[Manufacturer]
+%StdMfg%=Standard,NT$ARCH$
+
+; Following section is meant for Windows 2000 as it 
+; cannot parse decorated model sections
+[Standard]
+;
+; Hw Id is root\PLANCK
+;
+%PLANCK.DeviceDesc%=PLANCK_Device, root\PLANCK
+
+; Decorated model section take precedence over undecorated 
+; ones on XP and later.
+[Standard.NT$ARCH$]
+%PLANCK.DeviceDesc%=PLANCK_Device, root\PLANCK
+
+[PLANCK_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+PLANCK.sys
+
+
+;-------------- Service installation
+[PLANCK_Device.NT.Services]
+AddService = PLANCK,%SPSVCINST_ASSOCSERVICE%, PLANCK_Service_Inst
+
+; -------------- PLANCK driver install sections
+[PLANCK_Service_Inst]
+DisplayName    = %PLANCK.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START 
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\PLANCK.sys
+LoadOrderGroup = Extended Base
+
+;
+;--- PLANCK_Device Coinstaller installation ------
+;
+
+[DestinationDirs]
+PLANCK_Device_CoInstaller_CopyFiles = 11
+
+[PLANCK_Device.NT.CoInstallers]
+AddReg=PLANCK_Device_CoInstaller_AddReg
+CopyFiles=PLANCK_Device_CoInstaller_CopyFiles
+
+[PLANCK_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[PLANCK_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[SourceDisksFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+[PLANCK_Device.NT.Wdf]
+KmdfService =  PLANCK, PLANCK_wdfsect
+[PLANCK_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+MSFT = "Microsoft"
+StdMfg = "(Standard system devices)"
+DiskId1 = "WDF Sample PLANCK Installation Disk #1"
+PLANCK.DeviceDesc = "PLANCK Driver"
+PLANCK.SVCDESC = "PLANCK Service"
+ClassName       = "Sample Device"
+
