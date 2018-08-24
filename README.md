@@ -1,4 +1,4 @@
-Creating your own Win7x64 driver in 2018 with WinDDK7.1 is fast and easy!
+If you have already been through the wonder of getting your code signing cert, creating your own Win7x64 driver in 2018 with WinDDK7.1 is just as fast and easy!
 
 1. Download and install MS WinDDK7.1
 2. Create a directory on a path with no spaces in the name (e.g. c:\users\user\myDriver) and cd into the directory
@@ -15,5 +15,5 @@ Creating your own Win7x64 driver in 2018 with WinDDK7.1 is fast and easy!
 13. From the same dir with the built objects, Inf2cat.exe /driver:. /os:7_x64 /verbose
 14. From powershell, $cert = Get-ChildItem -Path "Cert:\CurrentUser\My\" -CodeSigningCert
 15. Then, from the directory with the built objects, Set-AuthenticodeSignature -FilePath .\\*.sys -Certificate $cert
-16. Finally, Then, Set-AuthenticodeSignature -FilePath .\\*.cat -Certificate $cert
+16. Finally, Set-AuthenticodeSignature -FilePath .\\*.cat -Certificate $cert
 17. Now, you're ready to install!
